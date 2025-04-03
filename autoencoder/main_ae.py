@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from autoencoder_module import AutoencoderReducer
-from scenario_generator import AEScenarioGenerator
+from scenario_generator_ae import AEScenarioGenerator
 from impact_analysis import (
     compute_portfolio_returns,
     compute_var,
