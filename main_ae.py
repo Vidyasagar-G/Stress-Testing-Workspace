@@ -22,7 +22,7 @@ sector_labels = [name.split('_')[0] for name in stock_names]
 weights = np.ones(25) / 25  # Equal-weighted portfolio
 
 # === ROLLING CONFIG === #
-window_size = 504  # ~2 years
+window_size = 252  # ~1 years
 step_size = 21     # ~1 month
 
 # === STRESS CONFIG === #
