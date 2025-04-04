@@ -1,8 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import tensorflow as tf
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Dense
 from tensorflow.keras.optimizers import Adam
+tf.random.set_seed(42)
+
 
 class AutoencoderReducer:
     """
@@ -62,7 +65,7 @@ class AutoencoderReducer:
         reconstructed_scaled = self.decoder.predict(latent_matrix)
         return reconstructed_scaled / self.scale_factor
 
-    def plot_reconstruction_loss(self):
+    def plot_reconstruction_loss(self, save_path=None):
         plt.figure(figsize=(8, 4))
         plt.plot(self.history.history['loss'], label='Training Loss')
         plt.title("Reconstruction Loss over Epochs")
@@ -71,4 +74,9 @@ class AutoencoderReducer:
         plt.grid(True)
         plt.legend()
         plt.tight_layout()
-        plt.show()
+        if save_path:
+            plt.savefig(save_path)
+            plt.close()
+        else:
+            plt.show()
+  
