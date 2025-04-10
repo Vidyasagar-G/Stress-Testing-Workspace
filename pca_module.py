@@ -13,6 +13,16 @@ class PCAReducer:
         self.components = self.pca.fit_transform(returns_matrix)
         self.explained_variance = self.pca.explained_variance_ratio_
 
+    def plot_explained_variance(self):
+        plt.figure(figsize=(8, 4))
+        plt.bar(range(1, len(self.explained_variance) + 1), self.explained_variance, tick_label=[f'PC{i}' for i in range(1, len(self.explained_variance) + 1)])
+        plt.title("Explained Variance by PCA Components")
+        plt.xlabel("Principal Component")
+        plt.ylabel("Explained Variance Ratio")
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()
+
     def get_components(self):
         return self.components
 

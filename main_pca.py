@@ -23,17 +23,17 @@ sector_labels = [name.split('_')[0] for name in stock_names]
 weights = np.ones(25) / 25
 
 # === ROLLING CONFIG === #
-window_size = 504  # ~2 years
+window_size = 252  # ~2 years
 step_size = 21     # ~1 month
 
 # === STRESS CONFIG === #
 # Option A: Single component (e.g., PC1)
-stress_mode = "single"  # or "multi"
+stress_mode = "multi"  # "single" or "multi"
 pc_index = 0            # Only used if stress_mode == "single"
 sigma_multiplier = 2.0
 
 # Option B: Multi-component stress (±σ on multiple PCs)
-shift_vector = [2.0, -1.5, 0.5, 0]  # For the first 4 PCs
+shift_vector = [2.0, -1.5, 1.0, 0.5, -0.5]  # For the first 5 PCs
 
 results = []
 
@@ -43,8 +43,10 @@ for start_idx in range(0, len(returns_matrix) - window_size + 1, step_size):
     window_dates = (dates[start_idx], dates[end_idx - 1])
 
     # === STEP 1: PCA ===
-    pca = PCAReducer(window_returns, n_components=0.95)
+    pca = PCAReducer(window_returns, n_components=5)
     components = pca.get_components()
+
+    # print("components: ",components.shape)
 
     # === BASELINE (Unstressed) ===
     base_returns = pca.inverse_transform(components)
@@ -84,6 +86,9 @@ for start_idx in range(0, len(returns_matrix) - window_size + 1, step_size):
         for sec in base_sector.keys()
     }
 
+    explained_variance = pca.get_explained_variance().tolist()
+    explained_variance_dict = {f"explained_variance_{i+1}": val for i, val in enumerate(explained_variance)}
+
     # === RECORD EVERYTHING ===
     results.append({
         "window_start": window_dates[0],
@@ -99,12 +104,17 @@ for start_idx in range(0, len(returns_matrix) - window_size + 1, step_size):
         "delta_Drawdown": delta_dd,
         "base_sector": {k: float(np.mean(v)) for k, v in base_sector.items()},
         "stress_sector": {k: float(np.mean(v)) for k, v in stress_sector.items()},
-        "delta_sector": delta_sector
+        "delta_sector": delta_sector,
+        "explained_variance": explained_variance_dict
     })
 
 # === EXPORT RESULTS === #
 df = pd.json_normalize(results)
-df.to_csv("rolling_stress_with_deltas.csv", index=False)
+if stress_mode == "single":
+    df.to_csv("rolling_stress_with_deltas.csv", index=False)
+elif stress_mode == "multi":
+    df.to_csv("rolling_stress_with_deltas_multiPC.csv", index=False)
 
-print("\n✅ Stress testing with baseline comparison complete.")
-print("Results saved to 'rolling_stress_with_deltas.csv'.")
+
+print("\nStress testing with baseline comparison complete.")
+print("Results saved to csv file.")
