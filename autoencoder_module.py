@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 import tensorflow as tf
@@ -79,3 +80,19 @@ class AutoencoderReducer:
             plt.close()
         else:
             plt.show()
+
+    def get_feature_dataframe(self, index=None):
+        """
+        Returns AE latent features as a DataFrame for ML regression.
+        """
+        latent = self.get_latent_features()
+        columns = [f"Z{i+1}" for i in range(latent.shape[1])]
+        return pd.DataFrame(latent, index=index, columns=columns)
+
+    def save_features(self, filepath, index=None):
+        """
+        Saves AE latent features as CSV.
+        """
+        df = self.get_feature_dataframe(index=index)
+        df.to_csv(filepath)
+        print(f"[✓] AE latent features saved to: {filepath}")

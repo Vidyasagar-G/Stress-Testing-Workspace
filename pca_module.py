@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 
@@ -42,3 +43,18 @@ class PCAReducer:
         plt.grid(True)
         plt.tight_layout()
         plt.show()
+
+    def get_feature_dataframe(self, index=None):
+        """
+        Returns PCA components as a DataFrame with column names PC1, PC2, ...
+        """
+        columns = [f"PC{i+1}" for i in range(self.components.shape[1])]
+        return pd.DataFrame(self.components, index=index, columns=columns)
+
+    def save_features(self, filepath, index=None):
+        """
+        Saves PCA components as CSV for ML regression.
+        """
+        df = self.get_feature_dataframe(index=index)
+        df.to_csv(filepath)
+        print(f"[✓] PCA features saved to: {filepath}")
